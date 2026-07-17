@@ -2,7 +2,7 @@ import multer from "multer";
 
 const MAX_SIZE_MB = 8;
 
-export const uploadImagenes = multer({
+const configBase = {
   storage: multer.memoryStorage(),
   limits: { fileSize: MAX_SIZE_MB * 1024 * 1024 },
   fileFilter(req, file, cb) {
@@ -11,4 +11,7 @@ export const uploadImagenes = multer({
     }
     cb(null, true);
   },
-}).array("imagenes");
+};
+
+export const uploadImagenes = multer(configBase).array("imagenes");
+export const uploadFotoPerfil = multer(configBase).single("foto");

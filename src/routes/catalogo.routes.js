@@ -8,6 +8,8 @@ const router = Router();
 router.use(autenticar, soloMarca);
 
 router.get("/categorias", catalogoController.getCategorias);
+router.get("/dashboard", catalogoController.getDashboard);
+router.get("/metricas", catalogoController.getMetricas);
 
 router.get("/productos", catalogoController.getProductosDeMarca);
 router.get("/productos/:idProducto", catalogoController.getProductoPorId);

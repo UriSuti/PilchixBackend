@@ -150,4 +150,36 @@ export const productoRepository = {
       await supabase.storage.from(BUCKET).remove([nombre]);
     }
   },
+
+  async getDashboardData(idMarca, desde) {
+    const { data, error } = await supabase
+      .from("Producto")
+      .select(`
+        id_producto,
+        nombre,
+        precio,
+        estado,
+        Imagen ( imagen ),
+        Metrica_Producto ( visualizaciones, clics, ventas, fecha )
+      `)
+      .eq("id_marca", idMarca)
+      .gte("Metrica_Producto.fecha", desde);
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async getMetricasData(idMarca, desde) {
+    const { data, error } = await supabase
+      .from("Producto")
+      .select(`
+        id_producto, nombre, precio, stock, estado,
+        Imagen ( imagen ),
+        Producto_Categoria ( Categoria ( nombre ) ),
+        Metrica_Producto ( visualizaciones, clics, ventas, fecha )
+      `)
+      .eq("id_marca", idMarca)
+      .gte("Metrica_Producto.fecha", desde);
+    if (error) throw new Error(error.message);
+    return data;
+  },
 };

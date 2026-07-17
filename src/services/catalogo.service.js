@@ -11,10 +11,22 @@ async function exigirPropietario(idProducto, idMarca) {
   if (!esPropietario) throw errorNoEncontrado("Producto no encontrado");
 }
 
+function fechaDesde(dias) {
+  const d = new Date();
+  d.setDate(d.getDate() - dias);
+  return d.toISOString().split("T")[0];
+}
+
 export const catalogoService = {
   getCategorias: () => productoRepository.getCategorias(),
 
   getProductosDeMarca: (idMarca) => productoRepository.getProductosDeMarca(idMarca),
+
+  getDashboardData: (idMarca, dias = 30) =>
+    productoRepository.getDashboardData(idMarca, fechaDesde(dias)),
+
+  getMetricasData: (idMarca, dias = 30) =>
+    productoRepository.getMetricasData(idMarca, fechaDesde(dias)),
 
   async getProductoPorId(idProducto, idMarca) {
     const producto = await productoRepository.getProductoPorId(idProducto, idMarca);

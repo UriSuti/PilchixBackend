@@ -112,4 +112,18 @@ export const catalogoController = {
       res.json({ ok: true });
     } catch (err) { next(err); }
   },
+
+  async getDashboard(req, res, next) {
+    try {
+      const dias = Number(req.query.dias) || 30;
+      res.json(await catalogoService.getDashboardData(req.auth.id, dias));
+    } catch (err) { next(err); }
+  },
+
+  async getMetricas(req, res, next) {
+    try {
+      const dias = Number(req.query.dias) || 30;
+      res.json(await catalogoService.getMetricasData(req.auth.id, dias));
+    } catch (err) { next(err); }
+  },
 };
