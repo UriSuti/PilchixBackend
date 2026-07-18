@@ -15,3 +15,7 @@ const configBase = {
 
 export const uploadImagenes = multer(configBase).array("imagenes");
 export const uploadFotoPerfil = multer(configBase).single("foto");
+export const uploadImagenLook = multer(configBase).fields([
+  { name: "imagen", maxCount: 1 },
+  { name: "imagen_hover", maxCount: 1 },
+]);

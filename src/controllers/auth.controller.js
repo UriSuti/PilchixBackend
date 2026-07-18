@@ -25,11 +25,11 @@ export const authController = {
 
   async registrarMarca(req, res, next) {
     try {
-      const { nombre, email, password } = req.body;
+      const { nombre, email, password, descripcion, ubicacion } = req.body;
       if (!nombre || !email || !password) {
         return res.status(400).json({ error: "Faltan campos obligatorios" });
       }
-      const data = await authService.registrarMarca({ nombre, email, password });
+      const data = await authService.registrarMarca({ nombre, email, password, descripcion, ubicacion });
       res.status(201).json(data);
     } catch (err) { next(err); }
   },

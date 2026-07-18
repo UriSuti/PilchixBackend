@@ -50,7 +50,7 @@ export const authService = {
   },
 
   // ---------- MARCA (vendedor) ----------
-  async registrarMarca({ nombre, email, password }) {
+  async registrarMarca({ nombre, email, password, descripcion, ubicacion }) {
     const existente = await marcaRepository.findByEmail(email);
     if (existente) {
       const err = new Error("Ese email ya está registrado");
@@ -59,10 +59,11 @@ export const authService = {
     }
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    const marca = await marcaRepository.create({ nombre, email, passwordHash });
+    const marca = await marcaRepository.create({ nombre, email, passwordHash, descripcion, ubicacion });
 
-    // NO devolvemos token: queda pendiente de aprobación
-    return { marca };
+    // el local queda activo y logueado directo
+    const token = generarToken({ id: marca.id_marca, tipo: "marca" });
+    return { marca, token };
   },
 
   async loginMarca({ email, password }) {

@@ -11,6 +11,7 @@ import favoritoRoutes from "./routes/favorito.routes.js";
 import suscripcionRoutes from "./routes/suscripcion.routes.js";
 import busquedaRoutes from "./routes/busqueda.routes.js";
 import usuarioRoutes from "./routes/usuario.routes.js";
+import lookRoutes from "./routes/look.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
@@ -30,6 +31,7 @@ app.use("/api/favoritos", favoritoRoutes);
 app.use("/api/suscripciones", suscripcionRoutes);
 app.use("/api/busquedas", busquedaRoutes);
 app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/looks", lookRoutes);
 
 app.use(errorHandler);
 
