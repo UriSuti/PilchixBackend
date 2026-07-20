@@ -42,6 +42,28 @@ export const lookService = {
     return look;
   },
 
+  async actualizar(idLook, idMarca, { titulo, productos }, { imagen, imagenHover } = {}) {
+    await exigirPropietario(idLook, idMarca);
+    const actuales = await lookRepository.getFotos(idLook);
+
+    const campos = {};
+    if (titulo !== undefined) campos.titulo = titulo?.trim() || null;
+    if (imagen) {
+      campos.imagen = await lookRepository.subirImagen(imagen.buffer, imagen.originalname, imagen.mimetype);
+    }
+    if (imagenHover) {
+      campos.imagen_hover = await lookRepository.subirImagen(imagenHover.buffer, imagenHover.originalname, imagenHover.mimetype);
+    }
+
+    await lookRepository.actualizar(idLook, campos);
+
+    // borra del storage las fotos viejas que fueron reemplazadas
+    if (campos.imagen && actuales.imagen) await lookRepository.borrarFoto(actuales.imagen);
+    if (campos.imagen_hover && actuales.imagen_hover) await lookRepository.borrarFoto(actuales.imagen_hover);
+
+    if (productos) await lookRepository.setProductos(idLook, productos);
+  },
+
   async setProductos(idLook, idMarca, productos) {
     await exigirPropietario(idLook, idMarca);
     await lookRepository.setProductos(idLook, productos ?? []);

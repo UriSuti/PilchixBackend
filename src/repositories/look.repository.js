@@ -87,17 +87,29 @@ export const lookRepository = {
     if (error) throw new Error(error.message);
   },
 
-  async getImagenes(idLook) {
+  async getFotos(idLook) {
     const { data } = await supabase
       .from("Look").select("imagen, imagen_hover").eq("id_look", idLook).maybeSingle();
-    return [data?.imagen, data?.imagen_hover].filter(Boolean);
+    return { imagen: data?.imagen ?? null, imagen_hover: data?.imagen_hover ?? null };
+  },
+
+  async actualizar(idLook, campos) {
+    if (!campos || Object.keys(campos).length === 0) return;
+    const { error } = await supabase.from("Look").update(campos).eq("id_look", idLook);
+    if (error) throw new Error(error.message);
+  },
+
+  async borrarFoto(url) {
+    if (!url) return;
+    const nombre = url.split("/").pop();
+    await supabase.storage.from(BUCKET).remove([nombre]);
   },
 
   async borrar(idLook) {
-    const urls = await this.getImagenes(idLook);
+    const { imagen, imagen_hover } = await this.getFotos(idLook);
     const { error } = await supabase.from("Look").delete().eq("id_look", idLook); // Look_Producto cae por cascade
     if (error) throw new Error(error.message);
-    const nombres = urls.map((u) => u.split("/").pop());
-    if (nombres.length) await supabase.storage.from(BUCKET).remove(nombres);
+    await this.borrarFoto(imagen);
+    await this.borrarFoto(imagen_hover);
   },
 };

@@ -43,6 +43,21 @@ export const lookController = {
     } catch (err) { next(err); }
   },
 
+  async actualizar(req, res, next) {
+    try {
+      const productos =
+        req.body.productos !== undefined ? parseProductos(req.body.productos) : undefined;
+      const files = req.files || {};
+      await lookService.actualizar(
+        req.params.idLook,
+        req.auth.id,
+        { titulo: req.body.titulo, productos },
+        { imagen: files.imagen?.[0], imagenHover: files.imagen_hover?.[0] }
+      );
+      res.json({ ok: true });
+    } catch (err) { next(err); }
+  },
+
   async setProductos(req, res, next) {
     try {
       const productos = parseProductos(req.body.productos);
