@@ -4,7 +4,7 @@ export const localesRepository = {
   async getMarcasActivas() {
     const { data, error } = await supabase
       .from("Marca")
-      .select("id_marca, nombre, descripcion, logo, sitio_web, ubicacion")
+      .select("id_marca, nombre, descripcion, logo, sitio_web, ubicacion, instagram, tiktok")
       .eq("estado", 1);
     if (error) throw new Error(error.message);
     return data;
@@ -14,7 +14,7 @@ export const localesRepository = {
     const { data, error } = await supabase
       .from("Marca")
       .select(`
-        id_marca, nombre, descripcion, logo, sitio_web, ubicacion,
+        id_marca, nombre, descripcion, logo, sitio_web, ubicacion, instagram, tiktok,
         Producto ( id_producto, Metrica_Producto ( visualizaciones ) )
       `)
       .eq("estado", 1);

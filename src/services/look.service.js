@@ -14,6 +14,10 @@ export const lookService = {
     return lookRepository.getPublicos();
   },
 
+  getPublicosDeMarca(idMarca) {
+    return lookRepository.getPublicosDeMarca(idMarca);
+  },
+
   getDeMarca(idMarca) {
     return lookRepository.getDeMarca(idMarca);
   },

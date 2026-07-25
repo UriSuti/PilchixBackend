@@ -7,6 +7,7 @@ const router = Router();
 
 // público (landing "Shop the look")
 router.get("/", lookController.getPublicos);
+router.get("/marca/:idMarca", lookController.getPublicosDeMarca);
 
 // back-office (marca)
 router.get("/mis", autenticar, soloMarca, lookController.getMisLooks);

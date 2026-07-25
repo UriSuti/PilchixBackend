@@ -25,6 +25,29 @@ export const lookRepository = {
     return data;
   },
 
+  // looks activos de una marca puntual (público, para su viewLocal)
+  async getPublicosDeMarca(idMarca) {
+    const { data, error } = await supabase
+      .from("Look")
+      .select(`
+        id_look, titulo, imagen, imagen_hover, fecha,
+        Marca ( id_marca, nombre, logo ),
+        Look_Producto (
+          pos_x, pos_y,
+          Producto (
+            id_producto, nombre, precio, estado,
+            Imagen ( imagen, es_portada ),
+            Marca ( nombre )
+          )
+        )
+      `)
+      .eq("id_marca", idMarca)
+      .eq("estado", true)
+      .order("fecha", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
   // looks de una marca (para el back-office)
   async getDeMarca(idMarca) {
     const { data, error } = await supabase

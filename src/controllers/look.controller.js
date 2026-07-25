@@ -23,6 +23,13 @@ export const lookController = {
     } catch (err) { next(err); }
   },
 
+  // público: looks de una marca puntual (para su viewLocal)
+  async getPublicosDeMarca(req, res, next) {
+    try {
+      res.json(await lookService.getPublicosDeMarca(req.params.idMarca));
+    } catch (err) { next(err); }
+  },
+
   // back-office: looks de la marca logueada
   async getMisLooks(req, res, next) {
     try {
