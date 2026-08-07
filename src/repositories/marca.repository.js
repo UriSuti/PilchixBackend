@@ -1,6 +1,19 @@
 import { supabase } from "../config/supabase.js";
 
+const BUCKET_FOTOS = "fotos-perfil";
+
 export const marcaRepository = {
+  async subirImagen(idMarca, buffer, nombreOriginal, mimetype, prefijo) {
+    const ext = nombreOriginal.split(".").pop();
+    const nombre = `${prefijo}-${idMarca}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage
+      .from(BUCKET_FOTOS)
+      .upload(nombre, buffer, { contentType: mimetype, upsert: true });
+    if (error) throw new Error(error.message);
+    const { data } = supabase.storage.from(BUCKET_FOTOS).getPublicUrl(nombre);
+    return data.publicUrl;
+  },
+
   async findByEmail(email) {
     const { data, error } = await supabase
       .from("Marca")

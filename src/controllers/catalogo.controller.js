@@ -26,6 +26,9 @@ export const catalogoController = {
     try {
       const { nombre, descripcion, precio, stock, estado, guia_talles, colores } = req.body;
       if (!nombre?.trim()) return res.status(400).json({ error: "Falta el nombre del producto" });
+      if (!Array.isArray(colores) || colores.length === 0) {
+        return res.status(400).json({ error: "Agregá al menos un color al producto" });
+      }
 
       const idProducto = await catalogoService.crearProducto(req.auth.id, {
         nombre: nombre.trim(),
@@ -44,6 +47,9 @@ export const catalogoController = {
     try {
       const { nombre, descripcion, precio, stock, estado, guia_talles, colores } = req.body;
       if (!nombre?.trim()) return res.status(400).json({ error: "Falta el nombre del producto" });
+      if (!Array.isArray(colores) || colores.length === 0) {
+        return res.status(400).json({ error: "Agregá al menos un color al producto" });
+      }
 
       await catalogoService.actualizarProducto(req.params.idProducto, req.auth.id, {
         nombre: nombre.trim(),
