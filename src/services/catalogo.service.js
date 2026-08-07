@@ -1,4 +1,5 @@
 import { productoRepository } from "../repositories/producto.repository.js";
+import { notificacionService } from "./notificacion.service.js";
 
 function errorNoEncontrado(msg = "No encontrado") {
   const err = new Error(msg);
@@ -35,7 +36,19 @@ export const catalogoService = {
   },
 
   async crearProducto(idMarca, datos) {
-    return productoRepository.crearProducto({ ...datos, id_marca: idMarca });
+    const idProducto = await productoRepository.crearProducto({ ...datos, id_marca: idMarca });
+
+    try {
+      await notificacionService.notificarSuscriptores({
+        idMarca,
+        idProducto,
+        tipo: "nuevo_producto",
+      });
+    } catch (e) {
+      console.error("No se pudieron generar notificaciones:", e.message);
+    }
+
+    return idProducto;
   },
 
   async actualizarProducto(idProducto, idMarca, datos) {
