@@ -27,6 +27,7 @@ export const notificacionRepository = {
         Producto ( nombre )
       `)
       .eq("id_usuario", idUsuario)
+      .eq("leida", false)          // ← solo no leídas
       .order("fecha", { ascending: false })
       .limit(30);
     if (error) throw new Error(error.message);
