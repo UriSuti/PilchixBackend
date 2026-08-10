@@ -19,3 +19,5 @@ export const uploadImagenLook = multer(configBase).fields([
   { name: "imagen", maxCount: 1 },
   { name: "imagen_hover", maxCount: 1 },
 ]);
+export const uploadLogoMarca = multer(configBase).single("logo");
+export const uploadFachadaMarca = multer(configBase).single("fachada");

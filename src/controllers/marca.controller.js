@@ -22,4 +22,26 @@ export const marcaController = {
       res.json({ ok: true });
     } catch (err) { next(err); }
   },
+
+  async subirLogo(req, res, next) {
+    try {
+      if (!req.file) return res.status(400).json({ error: "No se envió ninguna imagen" });
+      const url = await marcaRepository.subirImagen(
+        req.auth.id, req.file.buffer, req.file.originalname, req.file.mimetype, "logo"
+      );
+      await marcaRepository.actualizarPerfil(req.auth.id, { logo: url });
+      res.json({ logo: url });
+    } catch (err) { next(err); }
+  },
+
+  async subirFachada(req, res, next) {
+    try {
+      if (!req.file) return res.status(400).json({ error: "No se envió ninguna imagen" });
+      const url = await marcaRepository.subirImagen(
+        req.auth.id, req.file.buffer, req.file.originalname, req.file.mimetype, "fachada"
+      );
+      await marcaRepository.actualizarPerfil(req.auth.id, { imagen_fachada: url });
+      res.json({ imagen_fachada: url });
+    } catch (err) { next(err); }
+  },
 };
