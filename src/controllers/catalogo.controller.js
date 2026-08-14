@@ -8,6 +8,13 @@ export const catalogoController = {
     } catch (err) { next(err); }
   },
 
+  async getEtiquetas(req, res, next) {
+    try {
+      const data = await catalogoService.getEtiquetas();
+      res.json(data);
+    } catch (err) { next(err); }
+  },
+
   async getProductosDeMarca(req, res, next) {
     try {
       const data = await catalogoService.getProductosDeMarca(req.auth.id);
@@ -81,6 +88,20 @@ export const catalogoController = {
   async actualizarCategoriasProducto(req, res, next) {
     try {
       await catalogoService.actualizarCategoriasProducto(req.params.idProducto, req.auth.id, req.body.idsCategorias ?? []);
+      res.json({ ok: true });
+    } catch (err) { next(err); }
+  },
+
+  async setEtiquetasProducto(req, res, next) {
+    try {
+      await catalogoService.setEtiquetasProducto(req.params.idProducto, req.auth.id, req.body.idsEtiquetas ?? []);
+      res.json({ ok: true });
+    } catch (err) { next(err); }
+  },
+
+  async actualizarEtiquetasProducto(req, res, next) {
+    try {
+      await catalogoService.actualizarEtiquetasProducto(req.params.idProducto, req.auth.id, req.body.idsEtiquetas ?? []);
       res.json({ ok: true });
     } catch (err) { next(err); }
   },
