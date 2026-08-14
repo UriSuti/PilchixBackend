@@ -81,7 +81,15 @@ export const productosPublicosRepository = {
     return data;
   },
 
-  // versión liviana: solo para contar productos activos por categoría (landing)
+  async getEtiquetas() {
+    const { data, error } = await supabase
+      .from("Etiqueta")
+      .select("id_etiqueta, nombre")
+      .order("nombre", { ascending: true });
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
   async getCategoriasConProductosResumen() {
     const { data, error } = await supabase
       .from("Producto_Categoria")
@@ -94,7 +102,6 @@ export const productosPublicosRepository = {
     return data;
   },
 
-  // versión completa: para la página /categoria/:slug (filtros por marca/talle)
   async getCategoriasConProductosCompleto() {
     const { data, error } = await supabase
       .from("Producto_Categoria")

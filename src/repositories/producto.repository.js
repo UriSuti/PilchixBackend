@@ -12,6 +12,16 @@ export const productoRepository = {
     return data;
   },
 
+  // ocasión/estilo de la prenda (noche, boliche, elegante, etc.) — mismo patrón que Categoria
+  async getEtiquetas() {
+    const { data, error } = await supabase
+      .from("Etiqueta")
+      .select("id_etiqueta, nombre")
+      .order("nombre");
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
   async getProductosDeMarca(idMarca) {
     const { data, error } = await supabase
       .from("Producto")
@@ -32,7 +42,8 @@ export const productoRepository = {
         id_producto, id_marca, nombre, descripcion, precio, stock, estado,
         guia_talles, colores,
         Imagen ( id_imagen, imagen, color, es_portada ),
-        Producto_Categoria ( id_categoria )
+        Producto_Categoria ( id_categoria ),
+        Producto_Etiqueta ( id_etiqueta )
       `)
       .eq("id_producto", idProducto)
       .eq("id_marca", idMarca)
@@ -80,6 +91,7 @@ export const productoRepository = {
     await supabase.from("Imagen").delete().eq("id_producto", idProducto);
     await supabase.from("Producto_Categoria").delete().eq("id_producto", idProducto);
     await supabase.from("Metrica_Producto").delete().eq("id_producto", idProducto);
+    await supabase.from("Producto_Etiqueta").delete().eq("id_producto", idProducto);
     const { error } = await supabase.from("Producto").delete().eq("id_producto", idProducto);
     if (error) throw new Error(error.message);
     return true;
@@ -99,6 +111,22 @@ export const productoRepository = {
       .eq("id_producto", idProducto);
     if (errorDelete) throw new Error(errorDelete.message);
     await this.setCategoriasProducto(idProducto, idsCategorias);
+  },
+
+  async setEtiquetasProducto(idProducto, idsEtiquetas) {
+    if (!idsEtiquetas.length) return;
+    const filas = idsEtiquetas.map((id_etiqueta) => ({ id_producto: idProducto, id_etiqueta }));
+    const { error } = await supabase.from("Producto_Etiqueta").insert(filas);
+    if (error) throw new Error(error.message);
+  },
+
+  async actualizarEtiquetasProducto(idProducto, idsEtiquetas) {
+    const { error: errorDelete } = await supabase
+      .from("Producto_Etiqueta")
+      .delete()
+      .eq("id_producto", idProducto);
+    if (errorDelete) throw new Error(errorDelete.message);
+    await this.setEtiquetasProducto(idProducto, idsEtiquetas);
   },
 
   async subirImagen(buffer, nombreOriginal, mimetype) {

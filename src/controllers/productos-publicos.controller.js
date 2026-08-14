@@ -40,6 +40,12 @@ export const productosPublicosController = {
     } catch (err) { next(err); }
   },
 
+  async getEtiquetas(req, res, next) {
+    try {
+      res.json(await productosPublicosRepository.getEtiquetas());
+    } catch (err) { next(err); }
+  },
+
   async getCategoriasConProductosResumen(req, res, next) {
     try {
       res.json(await productosPublicosRepository.getCategoriasConProductosResumen());

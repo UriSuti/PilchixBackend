@@ -21,6 +21,8 @@ function fechaDesde(dias) {
 export const catalogoService = {
   getCategorias: () => productoRepository.getCategorias(),
 
+  getEtiquetas: () => productoRepository.getEtiquetas(),
+
   getProductosDeMarca: (idMarca) => productoRepository.getProductosDeMarca(idMarca),
 
   getDashboardData: (idMarca, dias = 30) =>
@@ -69,6 +71,16 @@ export const catalogoService = {
   async actualizarCategoriasProducto(idProducto, idMarca, idsCategorias) {
     await exigirPropietario(idProducto, idMarca);
     await productoRepository.actualizarCategoriasProducto(idProducto, idsCategorias);
+  },
+
+  async setEtiquetasProducto(idProducto, idMarca, idsEtiquetas) {
+    await exigirPropietario(idProducto, idMarca);
+    await productoRepository.setEtiquetasProducto(idProducto, idsEtiquetas);
+  },
+
+  async actualizarEtiquetasProducto(idProducto, idMarca, idsEtiquetas) {
+    await exigirPropietario(idProducto, idMarca);
+    await productoRepository.actualizarEtiquetasProducto(idProducto, idsEtiquetas);
   },
 
   async subirImagenesProducto(idProducto, idMarca, files, metaPorArchivo) {

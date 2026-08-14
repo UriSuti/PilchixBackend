@@ -11,6 +11,7 @@ router.get("/buscar", productosPublicosController.buscarProductos);
 router.get("/buscar/categorias", productosPublicosController.buscarProductosPorCategoria);
 
 router.get("/categorias", productosPublicosController.getCategorias);
+router.get("/etiquetas", productosPublicosController.getEtiquetas);
 router.get("/categorias/resumen", productosPublicosController.getCategoriasConProductosResumen);
 router.get("/categorias/completo", productosPublicosController.getCategoriasConProductosCompleto);
 router.get("/categorias/buscar", productosPublicosController.buscarCategoriasPorNombre);
