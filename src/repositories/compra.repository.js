@@ -1,6 +1,16 @@
 import { supabase } from "../config/supabase.js";
 
 export const compraRepository = {
+  async buscarPorIdPagoMp(idPagoMp) {
+    const { data, error } = await supabase
+      .from("Compra")
+      .select("id_compra")
+      .eq("id_pago_mp", idPagoMp)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data?.id_compra ?? null;
+  },
+
   async getCarritoConDetalle(idUsuario) {
     const { data: carrito, error: eCarrito } = await supabase
       .from("Carrito")
@@ -45,7 +55,40 @@ export const compraRepository = {
     const { error: eDetalle } = await supabase.from("Compra_Detalle").insert(filas);
     if (eDetalle) throw new Error(eDetalle.message);
 
+    await this.registrarVentas(detalles);
+
     return compra.id_compra;
+  },
+
+  // Suma la cantidad vendida de cada línea a Metrica_Producto del día de hoy
+  // (misma tabla que lee el dashboard de métricas de la marca). Si todavía no
+  // hay fila para ese producto hoy, la crea.
+  async registrarVentas(detalles) {
+    const hoy = new Date().toISOString().slice(0, 10);
+
+    for (const d of detalles) {
+      const { data: fila, error: eSelect } = await supabase
+        .from("Metrica_Producto")
+        .select("id_producto, ventas")
+        .eq("id_producto", d.id_producto)
+        .eq("fecha", hoy)
+        .maybeSingle();
+      if (eSelect) throw new Error(eSelect.message);
+
+      if (fila) {
+        const { error: eUpdate } = await supabase
+          .from("Metrica_Producto")
+          .update({ ventas: (fila.ventas ?? 0) + d.cantidad })
+          .eq("id_producto", d.id_producto)
+          .eq("fecha", hoy);
+        if (eUpdate) throw new Error(eUpdate.message);
+      } else {
+        const { error: eInsert } = await supabase
+          .from("Metrica_Producto")
+          .insert({ id_producto: d.id_producto, fecha: hoy, ventas: d.cantidad, visualizaciones: 0, clics: 0 });
+        if (eInsert) throw new Error(eInsert.message);
+      }
+    }
   },
 
   async vaciarCarrito(idCarrito) {
