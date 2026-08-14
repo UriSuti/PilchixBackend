@@ -79,6 +79,7 @@ export const productoRepository = {
 
     await supabase.from("Imagen").delete().eq("id_producto", idProducto);
     await supabase.from("Producto_Categoria").delete().eq("id_producto", idProducto);
+    await supabase.from("Metrica_Producto").delete().eq("id_producto", idProducto);
     const { error } = await supabase.from("Producto").delete().eq("id_producto", idProducto);
     if (error) throw new Error(error.message);
     return true;
