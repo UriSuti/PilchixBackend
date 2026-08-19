@@ -12,12 +12,47 @@ export const productoRepository = {
     return data;
   },
 
-  // ocasión/estilo de la prenda (noche, boliche, elegante, etc.) — mismo patrón que Categoria
-  async getEtiquetas() {
+  // ocasión/estilo de la prenda (noche, boliche, elegante, etc.). id_marca null = etiqueta
+  // general (visible para todas las marcas); seteado = privada de esa marca.
+  async getEtiquetas(idMarca) {
     const { data, error } = await supabase
       .from("Etiqueta")
-      .select("id_etiqueta, nombre")
+      .select("id_etiqueta, nombre, id_marca")
+      .or(`id_marca.is.null,id_marca.eq.${idMarca}`)
       .order("nombre");
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async crearEtiqueta(nombre, idMarca) {
+    const { data, error } = await supabase
+      .from("Etiqueta")
+      .insert([{ nombre, id_marca: idMarca }])
+      .select("id_etiqueta, nombre, id_marca")
+      .single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  // subcategorias: siempre privadas de la marca que las creó, dentro de una categoria general
+  async getSubcategorias(idCategoria, idMarca) {
+    let query = supabase
+      .from("Subcategoria")
+      .select("id_subcategoria, nombre, id_categoria, id_marca")
+      .eq("id_marca", idMarca)
+      .order("nombre");
+    if (idCategoria) query = query.eq("id_categoria", idCategoria);
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async crearSubcategoria(nombre, idCategoria, idMarca) {
+    const { data, error } = await supabase
+      .from("Subcategoria")
+      .insert([{ nombre, id_categoria: idCategoria, id_marca: idMarca }])
+      .select("id_subcategoria, nombre, id_categoria, id_marca")
+      .single();
     if (error) throw new Error(error.message);
     return data;
   },
@@ -43,6 +78,7 @@ export const productoRepository = {
         guia_talles, colores,
         Imagen ( id_imagen, imagen, color, es_portada ),
         Producto_Categoria ( id_categoria ),
+        Producto_Subcategoria ( id_subcategoria ),
         Producto_Etiqueta ( id_etiqueta )
       `)
       .eq("id_producto", idProducto)
@@ -90,6 +126,7 @@ export const productoRepository = {
 
     await supabase.from("Imagen").delete().eq("id_producto", idProducto);
     await supabase.from("Producto_Categoria").delete().eq("id_producto", idProducto);
+    await supabase.from("Producto_Subcategoria").delete().eq("id_producto", idProducto);
     await supabase.from("Metrica_Producto").delete().eq("id_producto", idProducto);
     await supabase.from("Producto_Etiqueta").delete().eq("id_producto", idProducto);
     const { error } = await supabase.from("Producto").delete().eq("id_producto", idProducto);
@@ -111,6 +148,22 @@ export const productoRepository = {
       .eq("id_producto", idProducto);
     if (errorDelete) throw new Error(errorDelete.message);
     await this.setCategoriasProducto(idProducto, idsCategorias);
+  },
+
+  async setSubcategoriasProducto(idProducto, idsSubcategorias) {
+    if (!idsSubcategorias.length) return;
+    const filas = idsSubcategorias.map((id_subcategoria) => ({ id_producto: idProducto, id_subcategoria }));
+    const { error } = await supabase.from("Producto_Subcategoria").insert(filas);
+    if (error) throw new Error(error.message);
+  },
+
+  async actualizarSubcategoriasProducto(idProducto, idsSubcategorias) {
+    const { error: errorDelete } = await supabase
+      .from("Producto_Subcategoria")
+      .delete()
+      .eq("id_producto", idProducto);
+    if (errorDelete) throw new Error(errorDelete.message);
+    await this.setSubcategoriasProducto(idProducto, idsSubcategorias);
   },
 
   async setEtiquetasProducto(idProducto, idsEtiquetas) {

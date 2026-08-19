@@ -10,8 +10,36 @@ export const catalogoController = {
 
   async getEtiquetas(req, res, next) {
     try {
-      const data = await catalogoService.getEtiquetas();
+      const data = await catalogoService.getEtiquetas(req.auth.id);
       res.json(data);
+    } catch (err) { next(err); }
+  },
+
+  async crearEtiqueta(req, res, next) {
+    try {
+      const { nombre } = req.body;
+      if (!nombre?.trim()) return res.status(400).json({ error: "Falta el nombre de la etiqueta" });
+
+      const data = await catalogoService.crearEtiqueta(nombre.trim(), req.auth.id);
+      res.status(201).json(data);
+    } catch (err) { next(err); }
+  },
+
+  async getSubcategorias(req, res, next) {
+    try {
+      const data = await catalogoService.getSubcategorias(req.query.id_categoria || null, req.auth.id);
+      res.json(data);
+    } catch (err) { next(err); }
+  },
+
+  async crearSubcategoria(req, res, next) {
+    try {
+      const { nombre, id_categoria } = req.body;
+      if (!nombre?.trim()) return res.status(400).json({ error: "Falta el nombre de la subcategoría" });
+      if (!id_categoria) return res.status(400).json({ error: "Falta la categoría de la subcategoría" });
+
+      const data = await catalogoService.crearSubcategoria(nombre.trim(), id_categoria, req.auth.id);
+      res.status(201).json(data);
     } catch (err) { next(err); }
   },
 
@@ -88,6 +116,20 @@ export const catalogoController = {
   async actualizarCategoriasProducto(req, res, next) {
     try {
       await catalogoService.actualizarCategoriasProducto(req.params.idProducto, req.auth.id, req.body.idsCategorias ?? []);
+      res.json({ ok: true });
+    } catch (err) { next(err); }
+  },
+
+  async setSubcategoriasProducto(req, res, next) {
+    try {
+      await catalogoService.setSubcategoriasProducto(req.params.idProducto, req.auth.id, req.body.idsSubcategorias ?? []);
+      res.json({ ok: true });
+    } catch (err) { next(err); }
+  },
+
+  async actualizarSubcategoriasProducto(req, res, next) {
+    try {
+      await catalogoService.actualizarSubcategoriasProducto(req.params.idProducto, req.auth.id, req.body.idsSubcategorias ?? []);
       res.json({ ok: true });
     } catch (err) { next(err); }
   },

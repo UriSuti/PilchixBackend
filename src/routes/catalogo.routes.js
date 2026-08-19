@@ -8,7 +8,10 @@ const router = Router();
 router.use(autenticar, soloMarca);
 
 router.get("/categorias", catalogoController.getCategorias);
+router.get("/subcategorias", catalogoController.getSubcategorias);
+router.post("/subcategorias", catalogoController.crearSubcategoria);
 router.get("/etiquetas", catalogoController.getEtiquetas);
+router.post("/etiquetas", catalogoController.crearEtiqueta);
 router.get("/dashboard", catalogoController.getDashboard);
 router.get("/metricas", catalogoController.getMetricas);
 
@@ -20,6 +23,9 @@ router.delete("/productos/:idProducto", catalogoController.borrarProducto);
 
 router.post("/productos/:idProducto/categorias", catalogoController.setCategoriasProducto);
 router.put("/productos/:idProducto/categorias", catalogoController.actualizarCategoriasProducto);
+
+router.post("/productos/:idProducto/subcategorias", catalogoController.setSubcategoriasProducto);
+router.put("/productos/:idProducto/subcategorias", catalogoController.actualizarSubcategoriasProducto);
 
 router.post("/productos/:idProducto/etiquetas", catalogoController.setEtiquetasProducto);
 router.put("/productos/:idProducto/etiquetas", catalogoController.actualizarEtiquetasProducto);

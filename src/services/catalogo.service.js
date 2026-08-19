@@ -21,7 +21,17 @@ function fechaDesde(dias) {
 export const catalogoService = {
   getCategorias: () => productoRepository.getCategorias(),
 
-  getEtiquetas: () => productoRepository.getEtiquetas(),
+  getEtiquetas: (idMarca) => productoRepository.getEtiquetas(idMarca),
+
+  async crearEtiqueta(nombre, idMarca) {
+    return productoRepository.crearEtiqueta(nombre, idMarca);
+  },
+
+  getSubcategorias: (idCategoria, idMarca) => productoRepository.getSubcategorias(idCategoria, idMarca),
+
+  async crearSubcategoria(nombre, idCategoria, idMarca) {
+    return productoRepository.crearSubcategoria(nombre, idCategoria, idMarca);
+  },
 
   getProductosDeMarca: (idMarca) => productoRepository.getProductosDeMarca(idMarca),
 
@@ -71,6 +81,16 @@ export const catalogoService = {
   async actualizarCategoriasProducto(idProducto, idMarca, idsCategorias) {
     await exigirPropietario(idProducto, idMarca);
     await productoRepository.actualizarCategoriasProducto(idProducto, idsCategorias);
+  },
+
+  async setSubcategoriasProducto(idProducto, idMarca, idsSubcategorias) {
+    await exigirPropietario(idProducto, idMarca);
+    await productoRepository.setSubcategoriasProducto(idProducto, idsSubcategorias);
+  },
+
+  async actualizarSubcategoriasProducto(idProducto, idMarca, idsSubcategorias) {
+    await exigirPropietario(idProducto, idMarca);
+    await productoRepository.actualizarSubcategoriasProducto(idProducto, idsSubcategorias);
   },
 
   async setEtiquetasProducto(idProducto, idMarca, idsEtiquetas) {

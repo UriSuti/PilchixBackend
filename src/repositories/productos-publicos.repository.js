@@ -81,10 +81,12 @@ export const productosPublicosRepository = {
     return data;
   },
 
+  // solo las etiquetas generales (id_marca null); las que crea cada marca son privadas
   async getEtiquetas() {
     const { data, error } = await supabase
       .from("Etiqueta")
       .select("id_etiqueta, nombre")
+      .is("id_marca", null)
       .order("nombre", { ascending: true });
     if (error) throw new Error(error.message);
     return data;
