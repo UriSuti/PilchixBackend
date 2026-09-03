@@ -62,7 +62,8 @@ export const productoRepository = {
       .from("Producto")
       .select(`
         id_producto, nombre, descripcion, precio, stock, estado, fecha_alta,
-        Imagen ( imagen, es_portada )
+        Imagen ( imagen, es_portada ),
+        Descuento ( porcentaje, precio_final, fecha_fin )
       `)
       .eq("id_marca", idMarca)
       .order("fecha_alta", { ascending: false });
@@ -120,6 +121,49 @@ export const productoRepository = {
     return data.length > 0;
   },
 
+  // precio + confirmación de propiedad en una sola consulta, para armar el descuento
+  async getProductoParaDescuento(idProducto, idMarca) {
+    const { data, error } = await supabase
+      .from("Producto")
+      .select("id_producto, precio")
+      .eq("id_producto", idProducto)
+      .eq("id_marca", idMarca)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async getDescuentoDeProducto(idProducto) {
+    const { data, error } = await supabase
+      .from("Descuento")
+      .select("id_descuento, porcentaje, precio_anterior, precio_final, fecha_inicio, fecha_fin")
+      .eq("id_producto", idProducto)
+      .order("id_descuento", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  // un solo descuento vigente por producto: el nuevo reemplaza cualquier otro existente
+  async setDescuentoProducto(idProducto, datos) {
+    const { error: errorDelete } = await supabase.from("Descuento").delete().eq("id_producto", idProducto);
+    if (errorDelete) throw new Error(errorDelete.message);
+
+    const { data, error } = await supabase
+      .from("Descuento")
+      .insert([{ id_producto: idProducto, ...datos }])
+      .select("id_descuento, porcentaje, precio_anterior, precio_final, fecha_inicio, fecha_fin")
+      .single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async quitarDescuentoProducto(idProducto) {
+    const { error } = await supabase.from("Descuento").delete().eq("id_producto", idProducto);
+    if (error) throw new Error(error.message);
+  },
+
   async borrarProducto(idProducto, idMarca) {
     const esPropietario = await this.esPropietario(idProducto, idMarca);
     if (!esPropietario) return false;
@@ -129,6 +173,7 @@ export const productoRepository = {
     await supabase.from("Producto_Subcategoria").delete().eq("id_producto", idProducto);
     await supabase.from("Metrica_Producto").delete().eq("id_producto", idProducto);
     await supabase.from("Producto_Etiqueta").delete().eq("id_producto", idProducto);
+    await supabase.from("Descuento").delete().eq("id_producto", idProducto);
     const { error } = await supabase.from("Producto").delete().eq("id_producto", idProducto);
     if (error) throw new Error(error.message);
     return true;

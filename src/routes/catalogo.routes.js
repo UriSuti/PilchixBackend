@@ -21,6 +21,10 @@ router.post("/productos", catalogoController.crearProducto);
 router.put("/productos/:idProducto", catalogoController.actualizarProducto);
 router.delete("/productos/:idProducto", catalogoController.borrarProducto);
 
+router.get("/productos/:idProducto/descuento", catalogoController.getDescuentoProducto);
+router.put("/productos/:idProducto/descuento", catalogoController.setDescuentoProducto);
+router.delete("/productos/:idProducto/descuento", catalogoController.quitarDescuentoProducto);
+
 router.post("/productos/:idProducto/categorias", catalogoController.setCategoriasProducto);
 router.put("/productos/:idProducto/categorias", catalogoController.actualizarCategoriasProducto);
 

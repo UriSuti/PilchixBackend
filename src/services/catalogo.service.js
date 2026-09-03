@@ -73,6 +73,35 @@ export const catalogoService = {
     if (!ok) throw errorNoEncontrado("Producto no encontrado");
   },
 
+  async getDescuentoProducto(idProducto, idMarca) {
+    await exigirPropietario(idProducto, idMarca);
+    return productoRepository.getDescuentoDeProducto(idProducto);
+  },
+
+  async setDescuentoProducto(idProducto, idMarca, { porcentaje, dias }) {
+    const producto = await productoRepository.getProductoParaDescuento(idProducto, idMarca);
+    if (!producto) throw errorNoEncontrado("Producto no encontrado");
+
+    const precioAnterior = Number(producto.precio) || 0;
+    const precioFinal = Math.round(precioAnterior * (1 - porcentaje / 100));
+    const fechaInicio = new Date();
+    const fechaFin = new Date(fechaInicio);
+    fechaFin.setDate(fechaFin.getDate() + dias);
+
+    return productoRepository.setDescuentoProducto(idProducto, {
+      porcentaje,
+      precio_anterior: precioAnterior,
+      precio_final: precioFinal,
+      fecha_inicio: fechaInicio.toISOString().split("T")[0],
+      fecha_fin: fechaFin.toISOString().split("T")[0],
+    });
+  },
+
+  async quitarDescuentoProducto(idProducto, idMarca) {
+    await exigirPropietario(idProducto, idMarca);
+    await productoRepository.quitarDescuentoProducto(idProducto);
+  },
+
   async setCategoriasProducto(idProducto, idMarca, idsCategorias) {
     await exigirPropietario(idProducto, idMarca);
     await productoRepository.setCategoriasProducto(idProducto, idsCategorias);

@@ -106,6 +106,36 @@ export const catalogoController = {
     } catch (err) { next(err); }
   },
 
+  async getDescuentoProducto(req, res, next) {
+    try {
+      const data = await catalogoService.getDescuentoProducto(req.params.idProducto, req.auth.id);
+      res.json(data);
+    } catch (err) { next(err); }
+  },
+
+  async setDescuentoProducto(req, res, next) {
+    try {
+      const porcentaje = Number(req.body.porcentaje);
+      const dias = Number(req.body.dias) || 30;
+      if (!Number.isFinite(porcentaje) || porcentaje <= 0 || porcentaje >= 100) {
+        return res.status(400).json({ error: "El porcentaje de descuento tiene que estar entre 1 y 99" });
+      }
+      if (!Number.isFinite(dias) || dias <= 0 || dias > 365) {
+        return res.status(400).json({ error: "La duración de la oferta tiene que ser entre 1 y 365 días" });
+      }
+
+      const data = await catalogoService.setDescuentoProducto(req.params.idProducto, req.auth.id, { porcentaje, dias });
+      res.status(201).json(data);
+    } catch (err) { next(err); }
+  },
+
+  async quitarDescuentoProducto(req, res, next) {
+    try {
+      await catalogoService.quitarDescuentoProducto(req.params.idProducto, req.auth.id);
+      res.json({ ok: true });
+    } catch (err) { next(err); }
+  },
+
   async setCategoriasProducto(req, res, next) {
     try {
       await catalogoService.setCategoriasProducto(req.params.idProducto, req.auth.id, req.body.idsCategorias ?? []);
