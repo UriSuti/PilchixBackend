@@ -9,7 +9,7 @@ export const marcaController = {
 
   async actualizarPerfil(req, res, next) {
     try {
-      const { descripcion, ubicacion, sitio_web, instagram, tiktok } = req.body;
+      const { descripcion, ubicacion, sitio_web, instagram, tiktok, sonido_ambiente } = req.body;
       const campos = {};
       // solo tocamos lo que venga en el body
       if (descripcion !== undefined) campos.descripcion = descripcion?.trim() || null;
@@ -17,6 +17,11 @@ export const marcaController = {
       if (sitio_web !== undefined) campos.sitio_web = sitio_web?.trim() || null;
       if (instagram !== undefined) campos.instagram = instagram?.trim() || null;
       if (tiktok !== undefined) campos.tiktok = tiktok?.trim() || null;
+      if (sonido_ambiente !== undefined) {
+        // solo un id conocido del catálogo (o null/"ninguno"): nunca texto libre
+        const PRESETS_VALIDOS = ["boutique", "urbano", "acustico", "energico", "minimal", "nocturno", "ninguno"];
+        campos.sonido_ambiente = PRESETS_VALIDOS.includes(sonido_ambiente) ? sonido_ambiente : null;
+      }
 
       await marcaRepository.actualizarPerfil(req.auth.id, campos);
       res.json({ ok: true });

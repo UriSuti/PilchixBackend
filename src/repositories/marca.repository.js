@@ -24,12 +24,27 @@ export const marcaRepository = {
     return data;
   },
 
+  // "sonido_ambiente" se agregó en scripts/sql/2026-08-31_sonido_ambiente.sql.
+  // Hasta que esa migración corra en la base, la columna no existe todavía y
+  // Supabase rechaza cualquier select/update que la mencione — en vez de que
+  // eso rompa TODO el perfil (incluidos campos que nada tienen que ver), se
+  // reintenta sin esa columna. Una vez corrida la migración, esto deja de
+  // hacer falta solo (el primer intento, con la columna, pasa a funcionar).
   async getPerfil(idMarca) {
-    const { data, error } = await supabase
+    const CAMPOS_BASE = "id_marca, nombre, email, logo, descripcion, ubicacion, sitio_web, instagram, tiktok";
+    let { data, error } = await supabase
       .from("Marca")
-      .select("id_marca, nombre, email, logo, descripcion, ubicacion, sitio_web, instagram, tiktok")
+      .select(`${CAMPOS_BASE}, sonido_ambiente`)
       .eq("id_marca", idMarca)
       .maybeSingle();
+
+    if (error?.message?.includes("sonido_ambiente")) {
+      ({ data, error } = await supabase
+        .from("Marca")
+        .select(CAMPOS_BASE)
+        .eq("id_marca", idMarca)
+        .maybeSingle());
+    }
     if (error) throw new Error(error.message);
     return data;
   },
@@ -37,6 +52,14 @@ export const marcaRepository = {
   async actualizarPerfil(idMarca, campos) {
     if (!campos || Object.keys(campos).length === 0) return;
     const { error } = await supabase.from("Marca").update(campos).eq("id_marca", idMarca);
+
+    if (error?.message?.includes("sonido_ambiente") && "sonido_ambiente" in campos) {
+      const { sonido_ambiente, ...resto } = campos;
+      if (Object.keys(resto).length === 0) return; // no había nada más para guardar
+      const { error: error2 } = await supabase.from("Marca").update(resto).eq("id_marca", idMarca);
+      if (error2) throw new Error(error2.message);
+      return;
+    }
     if (error) throw new Error(error.message);
   },
 
