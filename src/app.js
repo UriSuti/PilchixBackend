@@ -15,6 +15,7 @@ import lookRoutes from "./routes/look.routes.js";
 import marcaRoutes from "./routes/marca.routes.js";
 import notificacionRoutes from "./routes/notificacion.routes.js";
 import pagoRoutes from "./routes/pago.routes.js"
+import categoriaRoutes from "./routes/categoria.routes.js"
 import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
@@ -38,6 +39,7 @@ app.use("/api/looks", lookRoutes);
 app.use("/api/marca", marcaRoutes);
 app.use("/api/notificaciones", notificacionRoutes);
 app.use("/api/pagos", pagoRoutes)
+app.use("/api/categorias-marca", categoriaRoutes);
 
 app.use(errorHandler);
 
