@@ -15,7 +15,11 @@ import lookRoutes from "./routes/look.routes.js";
 import marcaRoutes from "./routes/marca.routes.js";
 import notificacionRoutes from "./routes/notificacion.routes.js";
 import pagoRoutes from "./routes/pago.routes.js"
+<<<<<<< HEAD
 import probadorRoutes from "./routes/probador.routes.js";
+=======
+import categoriaRoutes from "./routes/categoria.routes.js"
+>>>>>>> 42f7b9116b589f686006ff203af82e116c049c7b
 import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
@@ -39,7 +43,11 @@ app.use("/api/looks", lookRoutes);
 app.use("/api/marca", marcaRoutes);
 app.use("/api/notificaciones", notificacionRoutes);
 app.use("/api/pagos", pagoRoutes)
+<<<<<<< HEAD
 app.use("/api/probador", probadorRoutes);
+=======
+app.use("/api/categorias-marca", categoriaRoutes);
+>>>>>>> 42f7b9116b589f686006ff203af82e116c049c7b
 
 app.use(errorHandler);
 
