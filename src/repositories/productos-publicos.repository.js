@@ -9,6 +9,21 @@ export const productosPublicosRepository = {
     return data;
   },
 
+  // producto público por id, con sus imágenes (para el probador virtual: necesita la portada)
+  async getProductoPublicoPorId(idProducto) {
+    const { data, error } = await supabase
+      .from("Producto")
+      .select(`
+        id_producto, nombre, estado,
+        Imagen ( imagen, es_portada )
+      `)
+      .eq("id_producto", idProducto)
+      .eq("estado", 1)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
   async getProductosPopulares() {
     const { data, error } = await supabase
       .from("Producto")

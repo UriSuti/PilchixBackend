@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_EXTRA_CA_CERTS=./fortinet-ca.crt nodemon src/server.js",
     "start": "node src/server.js",
-    "migrar": "cross-env NODE_EXTRA_CA_CERTS=./fortinet-ca.crt node scripts/migrar-passwords.js"
+    "migrar": "cross-env NODE_EXTRA_CA_CERTS=./fortinet-ca.crt node scripts/migrar-passwords.js",
+    "test:fashn": "cross-env NODE_EXTRA_CA_CERTS=./fortinet-ca.crt node scripts/test-fashn.js"
   },
   "keywords": [],
   "author": "",
