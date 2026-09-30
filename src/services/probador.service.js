@@ -11,7 +11,21 @@ function dataUriABuffer(dataUri) {
 }
 
 export const probadorService = {
-  async generar(idUsuario, idProducto, foto) {
+  // foto: archivo subido ahora (opcional). Si no viene, se usa la foto guardada
+  // en el perfil. guardarFoto: si es true, la foto subida queda guardada en el perfil.
+  async generar(idUsuario, idProducto, foto, { guardarFoto = false } = {}) {
+    let modelImage;
+    if (foto) {
+      modelImage = `data:${foto.mimetype};base64,${foto.buffer.toString("base64")}`;
+    } else {
+      modelImage = await probadorRepository.getFotoProbador(idUsuario);
+      if (!modelImage) {
+        const err = new Error("Falta la foto");
+        err.status = 400;
+        throw err;
+      }
+    }
+
     const usos = await probadorRepository.contarUsosUltimas24hs(idUsuario);
     if (usos >= LIMITE_DIARIO) {
       const err = new Error(
@@ -34,8 +48,6 @@ export const probadorService = {
       err.status = 422;
       throw err;
     }
-
-    const modelImage = `data:${foto.mimetype};base64,${foto.buffer.toString("base64")}`;
 
     const jobId = await fashnClient.run({ productImage: portada.imagen, modelImage });
     const imagenResultado = await fashnClient.esperarResultado(jobId);
@@ -64,10 +76,42 @@ export const probadorService = {
     // fallidos del límite diario)
     await probadorRepository.registrarUso(idUsuario, idProducto, urlResultado);
 
-    return { imagen: urlResultado };
+    // se guarda recién acá, así una generación fallida no cambia la foto del perfil
+    const fotoGuardada = foto && guardarFoto ? await this.guardarFoto(idUsuario, foto) : undefined;
+
+    return { imagen: urlResultado, fotoProbador: fotoGuardada };
   },
 
   listarHistorial(idUsuario) {
     return probadorRepository.getHistorial(idUsuario);
+  },
+
+  async borrarPrueba(idUsuario, idPrueba) {
+    const borrada = await probadorRepository.borrarPrueba(idUsuario, idPrueba);
+    if (!borrada) {
+      const err = new Error("Prueba no encontrada");
+      err.status = 404;
+      throw err;
+    }
+  },
+
+  /* ---------- foto guardada del usuario ---------- */
+  getFoto(idUsuario) {
+    return probadorRepository.getFotoProbador(idUsuario);
+  },
+
+  // sube la foto nueva, la deja como la del perfil y borra la anterior
+  async guardarFoto(idUsuario, foto) {
+    const anterior = await probadorRepository.getFotoProbador(idUsuario);
+    const url = await probadorRepository.subirFotoModelo(foto.buffer, foto.mimetype, idUsuario);
+    await probadorRepository.setFotoProbador(idUsuario, url);
+    if (anterior) await probadorRepository.borrarArchivo(anterior);
+    return url;
+  },
+
+  async borrarFoto(idUsuario) {
+    const anterior = await probadorRepository.getFotoProbador(idUsuario);
+    await probadorRepository.setFotoProbador(idUsuario, null);
+    if (anterior) await probadorRepository.borrarArchivo(anterior);
   },
 };

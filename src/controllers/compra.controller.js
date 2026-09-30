@@ -8,4 +8,12 @@ export const compraController = {
       res.json(data);
     } catch (err) { next(err); }
   },
+
+  // TEMPORAL: ver compraService.registrarCompraSinVerificar
+  async registrarAlPagar(req, res, next) {
+    try {
+      const data = await compraService.registrarCompraSinVerificar(req.auth.id);
+      res.json(data);
+    } catch (err) { next(err); }
+  },
 };

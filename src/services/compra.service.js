@@ -52,4 +52,23 @@ export const compraService = {
 
     return { ok: true, compra: idCompra };
   },
+
+  // TEMPORAL: registra la compra con el carrito actual apenas el usuario hace
+  // click en pagar (antes del redirect a Mercado Pago), sin verificar el pago.
+  // Sacar cuando se vuelva a usar confirmarCompra con la verificación de MP.
+  async registrarCompraSinVerificar(idUsuario) {
+    const carrito = await compraRepository.getCarritoConDetalle(idUsuario);
+    if (!carrito || carrito.detalles.length === 0) {
+      return { ok: true, compra: null };
+    }
+
+    const idCompra = await compraRepository.registrarCompra({
+      idUsuario,
+      idPagoMp: null,
+      detalles: carrito.detalles,
+    });
+    await compraRepository.vaciarCarrito(carrito.idCarrito);
+
+    return { ok: true, compra: idCompra };
+  },
 };

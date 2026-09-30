@@ -1,4 +1,5 @@
 import { supabase } from "../config/supabase.js";
+import { ventaRepository } from "./venta.repository.js";
 
 export const compraRepository = {
   async buscarPorIdPagoMp(idPagoMp) {
@@ -56,6 +57,8 @@ export const compraRepository = {
     if (eDetalle) throw new Error(eDetalle.message);
 
     await this.registrarVentas(detalles);
+    // suma a "por cobrar" de cada marca involucrada
+    await ventaRepository.registrarVentasDeCompra(compra.id_compra, detalles);
 
     return compra.id_compra;
   },

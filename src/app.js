@@ -17,6 +17,7 @@ import notificacionRoutes from "./routes/notificacion.routes.js";
 import pagoRoutes from "./routes/pago.routes.js"
 import probadorRoutes from "./routes/probador.routes.js";
 import categoriaRoutes from "./routes/categoria.routes.js"
+import ventaRoutes from "./routes/venta.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
@@ -42,6 +43,7 @@ app.use("/api/notificaciones", notificacionRoutes);
 app.use("/api/pagos", pagoRoutes)
 app.use("/api/probador", probadorRoutes);
 app.use("/api/categorias-marca", categoriaRoutes);
+app.use("/api/ventas", ventaRoutes);
 
 app.use(errorHandler);
 
