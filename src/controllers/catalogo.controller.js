@@ -1,4 +1,5 @@
 import { catalogoService } from "../services/catalogo.service.js";
+import { metricasService } from "../services/metricas.service.js";
 
 export const catalogoController = {
   async getCategorias(req, res, next) {
@@ -221,8 +222,7 @@ export const catalogoController = {
 
   async getMetricas(req, res, next) {
     try {
-      const dias = Number(req.query.dias) || 30;
-      res.json(await catalogoService.getMetricasData(req.auth.id, dias));
+      res.json(await metricasService.getMetricas(req.auth.id, req.query.dias));
     } catch (err) { next(err); }
   },
 };
