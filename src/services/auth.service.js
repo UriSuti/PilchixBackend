@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { usuarioRepository } from "../repositories/usuario.repository.js";
 import { marcaRepository } from "../repositories/marca.repository.js";
+import { liquidacionRepository } from "../repositories/liquidacion.repository.js";
 
 const SALT_ROUNDS = 10;
 
@@ -90,5 +91,20 @@ export const authService = {
     const { contraseña, ...marcaSinPassword } = marca;
     const token = generarToken({ id: marca.id_marca, tipo: "marca" });
     return { marca: marcaSinPassword, token };
+  },
+
+  // ---------- ADMIN (Pilchix) ----------
+  async loginAdmin({ email, password }) {
+    const admin = await liquidacionRepository.findAdminByEmail(email);
+    const coincide = admin && (await bcrypt.compare(password, admin.contraseña));
+    if (!coincide) {
+      const err = new Error("Email o contraseña incorrectos");
+      err.status = 401;
+      throw err;
+    }
+
+    const { contraseña, ...adminSinPassword } = admin;
+    const token = generarToken({ id: admin.id_admin, tipo: "admin" });
+    return { admin: adminSinPassword, token };
   },
 };

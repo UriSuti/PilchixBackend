@@ -31,12 +31,23 @@ export const ventaRepository = {
     if (error) throw new Error(error.message);
   },
 
+  // true si la liquidación incluye al menos una venta de la marca
+  async marcaTieneLiquidacion(idMarca, idLiquidacion) {
+    const { count, error } = await supabase
+      .from("Venta_Marca")
+      .select("id_venta", { count: "exact", head: true })
+      .eq("id_marca", idMarca)
+      .eq("id_liquidacion", idLiquidacion);
+    if (error) throw new Error(error.message);
+    return count > 0;
+  },
+
   // ventas de la marca, más nuevas primero, con el comprador y solo las líneas de sus productos
   async getVentasDeMarca(idMarca) {
     const { data: ventas, error } = await supabase
       .from("Venta_Marca")
       .select(`
-        id_venta, id_compra, monto, estado, fecha, fecha_cobro,
+        id_venta, id_compra, monto, estado, fecha, fecha_cobro, id_liquidacion,
         Compra ( id_usuario, Usuario ( nombre, email ) )
       `)
       .eq("id_marca", idMarca)

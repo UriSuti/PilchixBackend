@@ -22,3 +22,14 @@ export const uploadImagenLook = multer(configBase).fields([
 ]);
 export const uploadLogoMarca = multer(configBase).single("logo");
 export const uploadFachadaMarca = multer(configBase).single("fachada");
+
+// comprobante de pago: imagen o PDF
+export const uploadComprobante = multer({
+  ...configBase,
+  fileFilter(req, file, cb) {
+    if (!file.mimetype.startsWith("image/") && file.mimetype !== "application/pdf") {
+      return cb(new Error("El comprobante tiene que ser una imagen o un PDF"));
+    }
+    cb(null, true);
+  },
+}).single("comprobante");

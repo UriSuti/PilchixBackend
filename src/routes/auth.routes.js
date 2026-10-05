@@ -7,5 +7,6 @@ router.post("/usuario/registro", authController.registrarUsuario);
 router.post("/usuario/login", authController.loginUsuario);
 router.post("/marca/registro", authController.registrarMarca);
 router.post("/marca/login", authController.loginMarca);
+router.post("/admin/login", authController.loginAdmin);
 
 export default router;

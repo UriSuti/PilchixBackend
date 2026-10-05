@@ -6,5 +6,6 @@ const router = Router();
 router.use(autenticar, soloMarca);
 
 router.get("/", ventaController.getVentas);
+router.get("/liquidaciones/:idLiquidacion/comprobante", ventaController.getComprobante);
 
 export default router;

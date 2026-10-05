@@ -22,6 +22,14 @@ export function soloMarca(req, res, next) {
   next();
 }
 
+// exige que sea un ADMIN de Pilchix (panel /superadmin)
+export function soloAdmin(req, res, next) {
+  if (req.auth?.tipo !== "admin") {
+    return res.status(403).json({ error: "Acceso solo para administradores" });
+  }
+  next();
+}
+
 // exige que sea un USUARIO (cliente)
 export function soloUsuario(req, res, next) {
   if (req.auth?.tipo !== "usuario") {

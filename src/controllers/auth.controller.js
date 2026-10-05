@@ -44,4 +44,15 @@ export const authController = {
       res.json(data);
     } catch (err) { next(err); }
   },
+
+  async loginAdmin(req, res, next) {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ error: "Faltan credenciales" });
+      }
+      const data = await authService.loginAdmin({ email, password });
+      res.json(data);
+    } catch (err) { next(err); }
+  },
 };
