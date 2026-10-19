@@ -6,6 +6,7 @@ export const probadorController = {
       // sin archivo se usa la foto guardada en el perfil
       const resultado = await probadorService.generar(req.auth.id, req.params.idProducto, req.file, {
         guardarFoto: req.body?.guardarFoto === "true",
+        color: req.body?.color || undefined,
       });
       res.json(resultado);
     } catch (err) { next(err); }

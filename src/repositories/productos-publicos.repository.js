@@ -15,7 +15,7 @@ export const productosPublicosRepository = {
       .from("Producto")
       .select(`
         id_producto, nombre, estado,
-        Imagen ( imagen, es_portada )
+        Imagen ( imagen, color, es_portada )
       `)
       .eq("id_producto", idProducto)
       .eq("estado", 1)

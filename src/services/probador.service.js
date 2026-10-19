@@ -10,10 +10,22 @@ function dataUriABuffer(dataUri) {
   return { mimetype: match[1], buffer: Buffer.from(match[2], "base64") };
 }
 
+// misma regla que la galería del front (getImagenesPorColor): las fotos del color
+// elegido; si no hay, las generales (sin color); si no, todas. Dentro de ese grupo,
+// la portada primero.
+function elegirImagen(imagenes = [], color) {
+  const normalizado = color?.toLowerCase();
+  const delColor = normalizado ? imagenes.filter((img) => img.color?.toLowerCase() === normalizado) : [];
+  const generales = imagenes.filter((img) => !img.color);
+  const grupo = delColor.length ? delColor : generales.length ? generales : imagenes;
+  return grupo.find((img) => img.es_portada) ?? grupo[0];
+}
+
 export const probadorService = {
   // foto: archivo subido ahora (opcional). Si no viene, se usa la foto guardada
   // en el perfil. guardarFoto: si es true, la foto subida queda guardada en el perfil.
-  async generar(idUsuario, idProducto, foto, { guardarFoto = false } = {}) {
+  // color: hex del color elegido, para probar la foto de ese color y no la portada.
+  async generar(idUsuario, idProducto, foto, { guardarFoto = false, color } = {}) {
     let modelImage;
     if (foto) {
       modelImage = `data:${foto.mimetype};base64,${foto.buffer.toString("base64")}`;
@@ -42,14 +54,14 @@ export const probadorService = {
       throw err;
     }
 
-    const portada = producto.Imagen?.find((img) => img.es_portada) ?? producto.Imagen?.[0];
-    if (!portada?.imagen) {
+    const imagen = elegirImagen(producto.Imagen, color);
+    if (!imagen?.imagen) {
       const err = new Error("Este producto todavía no tiene una foto para probar");
       err.status = 422;
       throw err;
     }
 
-    const jobId = await fashnClient.run({ productImage: portada.imagen, modelImage });
+    const jobId = await fashnClient.run({ productImage: imagen.imagen, modelImage });
     const imagenResultado = await fashnClient.esperarResultado(jobId);
     if (!imagenResultado) {
       const err = new Error("FASHN no devolvió ninguna imagen");
