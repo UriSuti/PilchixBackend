@@ -1,4 +1,5 @@
 import { supabase } from "../config/supabase.js";
+import { CAMPOS_PRESENTACION, selectConFallback } from "./columnas-opcionales.js";
 
 export const localesRepository = {
   // ver la nota sobre "sonido_ambiente" en marca.repository.js: mientras no
@@ -30,17 +31,25 @@ export const localesRepository = {
     return data;
   },
 
-  // para la página /locales: fachada + productos (contar) + métricas (ordenar)
+  // para la página /locales (directorio): datos de presentación de la marca,
+  // sus categorías y, por producto, lo necesario para miniaturas con precio,
+  // "lo más vendido", puntuación (Opinion.recomienda) y orden por novedad.
   async getLocalesConProductos() {
-    const { data, error } = await supabase
-      .from("Marca")
-      .select(`
-        id_marca, nombre, descripcion, logo, ubicacion, imagen_fachada,
-        Producto ( id_producto, estado, Metrica_Producto ( visualizaciones ) )
-      `)
-      .eq("estado", 1);
-    if (error) throw new Error(error.message);
-    return data;
+    const RELACIONES = `
+      Marca_Categoria ( Categoria ( nombre ) ),
+      Producto (
+        id_producto, nombre, precio, estado, fecha_alta,
+        Imagen ( imagen, es_portada ),
+        Descuento ( precio_final, fecha_inicio, fecha_fin ),
+        Metrica_Producto ( visualizaciones, ventas ),
+        Opinion ( recomienda ),
+        Producto_Categoria ( Categoria ( nombre ) )
+      )`;
+    const BASE = "id_marca, nombre, descripcion, logo, ubicacion, imagen_fachada, sitio_web, instagram, tiktok";
+    return selectConFallback(
+      [`${BASE}, ${CAMPOS_PRESENTACION}, ${RELACIONES}`, `${BASE}, ${RELACIONES}`],
+      (campos) => supabase.from("Marca").select(campos).eq("estado", 1)
+    );
   },
 
   async buscarMarcas(texto) {
