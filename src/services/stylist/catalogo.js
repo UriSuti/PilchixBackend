@@ -62,7 +62,7 @@ export function familiasEnTexto(texto) {
 // paleta de referencia para nombrar los hex (solo colores "con color": los
 // grises, el negro y el blanco se resuelven aparte por luminosidad).
 // "familia" agrupa matices para filtrar: pedir "azul" trae también azul marino y denim
-const NOMBRES_COLOR = [
+export const NOMBRES_COLOR = [
   ["crema", "beige", [236, 228, 212]],
   ["beige", "beige", [212, 198, 178]],
   ["camel", "marron", [190, 150, 105]],

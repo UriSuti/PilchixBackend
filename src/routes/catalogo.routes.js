@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { catalogoController } from "../controllers/catalogo.controller.js";
+import { importacionController } from "../controllers/importacion.controller.js";
 import { autenticar, soloMarca } from "../middlewares/auth.middleware.js";
 import { uploadImagenes } from "../middlewares/upload.middleware.js";
 
@@ -38,5 +39,11 @@ router.post("/productos/:idProducto/imagenes", uploadImagenes, catalogoControlle
 router.put("/productos/:idProducto/imagenes/:idImagen/portada", catalogoController.marcarPortada);
 router.put("/imagenes/:idImagen/color", catalogoController.actualizarColorImagen);
 router.delete("/imagenes/:idImagen", catalogoController.borrarImagen);
+
+// carga masiva desde la tienda online del local: leer → revisar → confirmar
+router.post("/importaciones", importacionController.iniciar);
+router.get("/importaciones/:id", importacionController.estado);
+router.post("/importaciones/:id/confirmar", importacionController.confirmar);
+router.delete("/importaciones/:id", importacionController.cancelar);
 
 export default router;

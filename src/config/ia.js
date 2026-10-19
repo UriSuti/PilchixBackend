@@ -32,8 +32,9 @@ function error(mensaje, status, httpStatus) {
 export function configIA() {
   return {
     baseUrl: (process.env.AI_BASE_URL || DEFAULTS.baseUrl).replace(/\/+$/, ""),
-    apiKey: process.env.AI_API_KEY || "",
-    models: (process.env.AI_MODEL || DEFAULTS.models).split(",").map((m) => m.trim()).filter(Boolean),
+    // GEMINI_* se acepta como alias de AI_*
+    apiKey: process.env.AI_API_KEY || process.env.GEMINI_API_KEY || "",
+    models: (process.env.AI_MODEL || process.env.GEMINI_MODEL || DEFAULTS.models).split(",").map((m) => m.trim()).filter(Boolean),
     // vacío = no se manda (algunos modelos no aceptan el parámetro)
     reasoningEffort: process.env.AI_REASONING_EFFORT ?? DEFAULTS.reasoningEffort,
   };
