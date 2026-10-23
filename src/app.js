@@ -20,6 +20,7 @@ import categoriaRoutes from "./routes/categoria.routes.js"
 import ventaRoutes from "./routes/venta.routes.js";
 import superadminRoutes from "./routes/superadmin.routes.js";
 import stylistRoutes from "./routes/stylist.routes.js";
+import tiendanubeRoutes from "./routes/tiendanube.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
@@ -48,6 +49,7 @@ app.use("/api/categorias-marca", categoriaRoutes);
 app.use("/api/ventas", ventaRoutes);
 app.use("/api/superadmin", superadminRoutes);
 app.use("/api/stylist", stylistRoutes);
+app.use("/api/importacion", tiendanubeRoutes);
 
 app.use(errorHandler);
 
