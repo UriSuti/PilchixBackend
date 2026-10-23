@@ -1,6 +1,8 @@
 import { probadorRepository } from "../repositories/probador.repository.js";
 import { productosPublicosRepository } from "../repositories/productos-publicos.repository.js";
+import { usuarioRepository } from "../repositories/usuario.repository.js";
 import { fashnClient } from "../config/fashn.js";
+import { mailService } from "./mail.service.js";
 
 const LIMITE_DIARIO = 20;
 
@@ -91,7 +93,17 @@ export const probadorService = {
     // se guarda recién acá, así una generación fallida no cambia la foto del perfil
     const fotoGuardada = foto && guardarFoto ? await this.guardarFoto(idUsuario, foto) : undefined;
 
-    return { imagen: urlResultado, fotoProbador: fotoGuardada };
+    // le mandamos la foto al mail registrado; si falla, la prueba igual se devuelve
+    const usuario = await usuarioRepository.findById(idUsuario).catch(() => null);
+    const mailEnviado = await mailService.enviarPruebaVirtual({
+      email: usuario?.email,
+      nombre: usuario?.nombre,
+      producto,
+      imagen: parseada.buffer,
+      mimetype: parseada.mimetype,
+    });
+
+    return { imagen: urlResultado, fotoProbador: fotoGuardada, mailEnviado };
   },
 
   listarHistorial(idUsuario) {
